@@ -34,34 +34,20 @@ function get_vendor(mac) {
     mac = sprintf("%02x:%02x:%02x:%02x:%02x:%02x", 
                   parts[12], parts[13], parts[14], 
                   parts[15], parts[16], parts[17])
-}' | sort -t "|" -k2 -ns\n", mac, port, vendor
-
-Downloading OUI database...
-=== MAC ADDRESSES WITH VENDOR LOOKUP ===
-00:0c:29:0d:af:59 | 3 | VMware, Inc.
-00:0c:29:13:a0:e0 | 3 | VMware, Inc.
-00:90:7f:d6:6f:a5 | 3 | WatchGuard Technologies, Inc.
-00:90:7f:d6:6f:a6 | 3 | WatchGuard Technologies, Inc.
-00:90:7f:d6:6f:a8 | 3 | WatchGuard Technologies, Inc.
-08:30:6b:21:ba:10 | 3 | Palo Alto Networks
-08:30:6b:21:ba:11 | 3 | Palo Alto Networks
-24:48:45:c3:8b:18 | 3 | Hangzhou Hikvision Digital Technology Co.,Ltd.
-30:87:d9:06:19:c0 | 3 | Ruckus Wireless
-78:e3:b5:cb:b1:84 | 3 | Hewlett Packard
-8c:e5:ef:b3:ee:41 | 3 | HUAWEI TECHNOLOGIES CO.,LTD
-a4:5d:36:8c:b4:00 | 3 | Hewlett Packard
-a4:5d:36:8c:b4:06 | 3 | Hewlett Packard
-b4:39:d6:ac:4f:00 | 3 | ProCurve Networking by HP
-c0:8a:de:3e:c9:24 | 3 | Ruckus Wireless
-c0:c5:20:b6:94:23 | 3 | Ruckus Wireless
-d4:68:4d:36:8c:20 | 3 | Ruckus Wireless
-d4:68:4d:36:b0:70 | 3 | Ruckus Wireless
-d4:c9:ef:30:83:e0 | 3 | Hewlett Packard
-e0:d3:b4:05:69:2d | 3 | Cisco Meraki
-e4:55:a8:57:8e:3c | 3 | Cisco Meraki
-e4:55:a8:6e:95:27 | 3 | Cisco Meraki
-e4:5f:01:ff:03:d3 | 3 | Raspberry Pi Trading Ltd
-c0:91:34:2a:20:00 | 4 | ProCurve Networking by HP
-awetobot@awetobot:~/py$ 
-
-
+    
+    # Extract port number from the last field
+    port = $NF
+    
+    # Convert port number to interface format (E1, E2, E3, etc.)
+    if (port ~ /^[0-9]+$/) {
+        interface = "E" port
+    } else {
+        interface = port
+    }
+    
+    # Get vendor information
+    vendor = get_vendor(mac)
+    
+    # Print result
+    printf "%s | %s | %s\n", mac, interface, vendor
+}' | sort -t "|" -k2 -n
