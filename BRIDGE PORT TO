@@ -1,0 +1,47 @@
+#!/bin/bash
+
+echo "=== BRIDGE PORT TO MAC MAPPING WITH VENDOR ==="
+echo "Port | MAC Count | MAC Address (Vendor)"
+echo "-----|-----------|---------------------"
+
+snmpwalk -v2c -c public 192.168.53.10 1.3.6.1.2.1.17.4.3.1.3 | \
+awk -F' = INTEGER: ' '
+function get_vendor(mac) {
+    split(mac, mac_parts, ":")
+    oui = toupper(mac_parts[1] mac_parts[2] mac_parts[3])
+    
+    if (oui == "000C29" || oui == "005056") return "VMware"
+    else if (oui == "000569" || oui == "001C14") return "Cisco"
+    else if (oui == "001B21" || oui == "7CFADF") return "HP"
+    else if (oui == "0016CB" || oui == "002481") return "Intel"
+    else if (oui == "D850E6" || oui == "A4B197") return "Apple"
+    else if (oui == "001AA0" || oui == "00219B") return "Dell"
+    else return "Unknown"
+}
+{
+    # Extract port number
+    port = $2
+    gsub(/[^0-9]/, "", port)
+    
+    # Extract MAC address
+    split($1, oid_parts, ".")
+    mac = sprintf("%02x:%02x:%02x:%02x:%02x:%02x", 
+                  strtonum("0x" oid_parts[12]), 
+                  strtonum("0x" oid_parts[13]), 
+                  strtonum("0x" oid_parts[14]), 
+                  strtonum("0x" oid_parts[15]), 
+                  strtonum("0x" oid_parts[16]), 
+                  strtonum("0x" oid_parts[17]))
+    
+    # Get vendor
+    vendor = get_vendor(mac)
+    
+    # Group by port dengan vendor info
+    mac_list[port] = (mac_list[port] == "" ? mac " (" vendor ")" : mac_list[port] ", " mac " (" vendor ")")
+    count[port]++
+}
+END {
+    for (port in count) {
+        printf "%-4s | %-9s | %s\n", port, count[port] " MACs", mac_list[port]
+    }
+}' | sort -n
