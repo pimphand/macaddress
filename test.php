@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Konfigurasi
-SWITCH_IP="192.168.1.1"
+SWITCH_IP="192.168.53.10"
 COMMUNITY="public"
 
 # OID
