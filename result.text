@@ -1,264 +1,67 @@
-snmpwalk -v2c -c public 192.168.53.10 1.3.6.1.2.1.17.4.3.1.3 | grep "3$"
+OUI_FILE="/tmp/oui.txt"
+if [ ! -f "$OUI_FILE" ]; then
+    echo "Downloading OUI database..."
+    wget -q -O "$OUI_FILE" http://standards-oui.ieee.org/oui/oui.txt
+fi
+
+echo "=== MAC ADDRESSES WITH VENDOR LOOKUP ==="
+
+snmpwalk -v2c -c public 192.168.53.10 1.3.6.1.2.1.17.4.3.1.3 | \
+awk -v oui_file="$OUI_FILE" '
+function get_vendor(mac) {
+    # Extract OUI (first 3 bytes)
+    split(mac, parts, ":")
+    oui = toupper(parts[1] "-" parts[2] "-" parts[3])
+    
+    # Cari di OUI database
+    cmd = "grep -i \"" oui "\" " oui_file " | head -1"
+    cmd | getline vendor_line
+    close(cmd)
+    
+    if (vendor_line != "") {
+        # Extract company name
+        split(vendor_line, line_parts, ")")
+        if (length(line_parts) > 1) {
+            gsub(/^[ \t]+|[ \t]+$/, "", line_parts[2])
+            return line_parts[2]
+        }
+    }
+    return "Unknown"
+}
+{
+    # Extract MAC address
+    split($1, parts, ".")
+    mac = sprintf("%02x:%02x:%02x:%02x:%02x:%02x", 
+                  parts[12], parts[13], parts[14], 
+                  parts[15], parts[16], parts[17])
+}' | sort -t "|" -k2 -ns\n", mac, port, vendor
+
+Downloading OUI database...
+=== MAC ADDRESSES WITH VENDOR LOOKUP ===
+00:0c:29:0d:af:59 | 3 | VMware, Inc.
+00:0c:29:13:a0:e0 | 3 | VMware, Inc.
+00:90:7f:d6:6f:a5 | 3 | WatchGuard Technologies, Inc.
+00:90:7f:d6:6f:a6 | 3 | WatchGuard Technologies, Inc.
+00:90:7f:d6:6f:a8 | 3 | WatchGuard Technologies, Inc.
+08:30:6b:21:ba:10 | 3 | Palo Alto Networks
+08:30:6b:21:ba:11 | 3 | Palo Alto Networks
+24:48:45:c3:8b:18 | 3 | Hangzhou Hikvision Digital Technology Co.,Ltd.
+30:87:d9:06:19:c0 | 3 | Ruckus Wireless
+78:e3:b5:cb:b1:84 | 3 | Hewlett Packard
+8c:e5:ef:b3:ee:41 | 3 | HUAWEI TECHNOLOGIES CO.,LTD
+a4:5d:36:8c:b4:00 | 3 | Hewlett Packard
+a4:5d:36:8c:b4:06 | 3 | Hewlett Packard
+b4:39:d6:ac:4f:00 | 3 | ProCurve Networking by HP
+c0:8a:de:3e:c9:24 | 3 | Ruckus Wireless
+c0:c5:20:b6:94:23 | 3 | Ruckus Wireless
+d4:68:4d:36:8c:20 | 3 | Ruckus Wireless
+d4:68:4d:36:b0:70 | 3 | Ruckus Wireless
+d4:c9:ef:30:83:e0 | 3 | Hewlett Packard
+e0:d3:b4:05:69:2d | 3 | Cisco Meraki
+e4:55:a8:57:8e:3c | 3 | Cisco Meraki
+e4:55:a8:6e:95:27 | 3 | Cisco Meraki
+e4:5f:01:ff:03:d3 | 3 | Raspberry Pi Trading Ltd
+c0:91:34:2a:20:00 | 4 | ProCurve Networking by HP
+awetobot@awetobot:~/py$ 
 
 
-iso.3.6.1.2.1.17.4.3.1.3.0.12.41.13.175.89 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.0.12.41.19.160.224 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.0.16.116.157.105.213 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.0.144.127.214.111.165 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.0.144.127.214.111.166 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.8.48.107.33.186.16 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.8.48.107.33.186.17 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.36.72.69.195.139.24 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.48.135.217.6.25.192 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.120.227.181.203.177.132 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.140.229.239.179.238.65 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.164.93.54.140.180.0 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.164.93.54.140.180.6 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.180.57.214.172.79.0 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.188.118.197.32.168.16 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.192.138.222.62.201.36 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.192.197.32.182.148.35 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.200.196.101.25.207.175 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.212.104.77.54.140.32 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.212.104.77.54.176.112 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.212.201.239.48.131.224 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.224.211.180.5.105.45 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.228.85.168.87.142.60 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.228.85.168.110.149.39 = INTEGER: 3
-iso.3.6.1.2.1.17.4.3.1.3.228.95.1.255.3.211 = INTEGER: 3
-
-
-00:0c:29:13:a0:e0: | E8
-00:90:7f:d6:6f:a5: | E15
-00:90:7f:d6:6f:a6: | E15
-08:30:6b:21:ba:10: | E1
-08:30:6b:21:ba:11: | E12
-24:48:45:c3:8b:18: | E2
-30:87:d9:06:19:c0: | E16
-78:e3:b5:cb:b1:84: | E11
-a4:5d:36:8c:b4:00: | E16
-a4:5d:36:8c:b4:06: | E16
-b4:39:d6:ac:4f:00: | E19
-c0:8a:de:3e:c9:24: | E17
-c0:91:34:2a:20:00: | ifIndex  (bridgePort 0)
-c0:c5:20:b6:94:23: | E20
-d4:68:4d:36:8c:20: | E19
-d4:68:4d:36:b0:70: | E20
-d4:c9:ef:30:83:e0: | E19
-e0:d3:b4:05:69:2d: | E10
-e4:55:a8:57:8e:3c: | E9
-e4:55:a8:6e:95:27: | E10
-e4:5f:01:ff:03:d3: | E6
-
-
-
-SWITCH_IP="192.168.53.10"
-COMMUNITY="public"
-
-# OIDs
-OID_PORTS="1.3.6.1.2.1.17.4.3.1.2"        # dot1dTpFdbPort (MAC -> Bridge Port)
-OID_PORT_IFINDEX="1.3.6.1.2.1.17.1.4.1.2" # dot1dBasePortIfIndex (Bridge Port -> ifIndex)
-OID_INTERFACES="1.3.6.1.2.1.2.2.1.2"      # ifDescr (Interface name)
-
-# Fetch data via SNMP
-echo "=== MAC -> Bridge Port ==="
-snmpwalk -v2c -c "$COMMUNITY" "$SWITCH_IP" $OID_PORTS
-
-echo ""
-echo "=== Bridge Port -> ifIndex ==="
-snmpwalk -v2c -c "$COMMUNITY" "$SWITCH_IP" $OID_PORT_IFINDEX
-
-echo ""
-echo "=== Interface Descriptions ==="
-snmpwalk -v2c -c "$COMMUNITY" "$SWITCH_IP" $OID_INTERFACES
-=== MAC -> Bridge Port ===
-iso.3.6.1.2.1.17.4.3.1.2.0.12.41.13.175.89 = INTEGER: 111
-iso.3.6.1.2.1.17.4.3.1.2.0.12.41.19.160.224 = INTEGER: 104
-iso.3.6.1.2.1.17.4.3.1.2.0.144.127.214.111.165 = INTEGER: 111
-iso.3.6.1.2.1.17.4.3.1.2.0.144.127.214.111.166 = INTEGER: 111
-iso.3.6.1.2.1.17.4.3.1.2.0.144.127.214.111.168 = INTEGER: 111
-iso.3.6.1.2.1.17.4.3.1.2.8.48.107.33.186.16 = INTEGER: 97
-iso.3.6.1.2.1.17.4.3.1.2.8.48.107.33.186.17 = INTEGER: 108
-iso.3.6.1.2.1.17.4.3.1.2.36.72.69.195.139.24 = INTEGER: 98
-iso.3.6.1.2.1.17.4.3.1.2.48.135.217.6.25.192 = INTEGER: 112
-iso.3.6.1.2.1.17.4.3.1.2.120.227.181.203.177.132 = INTEGER: 107
-iso.3.6.1.2.1.17.4.3.1.2.140.229.239.179.238.65 = INTEGER: 99
-iso.3.6.1.2.1.17.4.3.1.2.164.93.54.140.180.0 = INTEGER: 112
-iso.3.6.1.2.1.17.4.3.1.2.164.93.54.140.180.6 = INTEGER: 112
-iso.3.6.1.2.1.17.4.3.1.2.180.57.214.172.79.0 = INTEGER: 115
-iso.3.6.1.2.1.17.4.3.1.2.192.138.222.62.201.36 = INTEGER: 113
-iso.3.6.1.2.1.17.4.3.1.2.192.145.52.42.32.0 = INTEGER: 0
-iso.3.6.1.2.1.17.4.3.1.2.192.197.32.182.148.35 = INTEGER: 116
-iso.3.6.1.2.1.17.4.3.1.2.212.104.77.54.140.32 = INTEGER: 115
-iso.3.6.1.2.1.17.4.3.1.2.212.104.77.54.176.112 = INTEGER: 116
-iso.3.6.1.2.1.17.4.3.1.2.212.201.239.48.131.224 = INTEGER: 115
-iso.3.6.1.2.1.17.4.3.1.2.224.211.180.5.105.45 = INTEGER: 106
-iso.3.6.1.2.1.17.4.3.1.2.228.85.168.87.142.60 = INTEGER: 105
-iso.3.6.1.2.1.17.4.3.1.2.228.85.168.110.149.39 = INTEGER: 106
-iso.3.6.1.2.1.17.4.3.1.2.228.95.1.255.3.211 = INTEGER: 102
-
-=== Bridge Port -> ifIndex ===
-iso.3.6.1.2.1.17.1.4.1.2.51 = INTEGER: 51
-iso.3.6.1.2.1.17.1.4.1.2.52 = INTEGER: 52
-iso.3.6.1.2.1.17.1.4.1.2.53 = INTEGER: 53
-iso.3.6.1.2.1.17.1.4.1.2.54 = INTEGER: 54
-iso.3.6.1.2.1.17.1.4.1.2.55 = INTEGER: 55
-iso.3.6.1.2.1.17.1.4.1.2.56 = INTEGER: 56
-iso.3.6.1.2.1.17.1.4.1.2.57 = INTEGER: 57
-iso.3.6.1.2.1.17.1.4.1.2.58 = INTEGER: 58
-iso.3.6.1.2.1.17.1.4.1.2.59 = INTEGER: 59
-iso.3.6.1.2.1.17.1.4.1.2.60 = INTEGER: 60
-iso.3.6.1.2.1.17.1.4.1.2.61 = INTEGER: 61
-iso.3.6.1.2.1.17.1.4.1.2.62 = INTEGER: 62
-iso.3.6.1.2.1.17.1.4.1.2.63 = INTEGER: 63
-iso.3.6.1.2.1.17.1.4.1.2.64 = INTEGER: 64
-iso.3.6.1.2.1.17.1.4.1.2.65 = INTEGER: 65
-iso.3.6.1.2.1.17.1.4.1.2.66 = INTEGER: 66
-iso.3.6.1.2.1.17.1.4.1.2.67 = INTEGER: 67
-iso.3.6.1.2.1.17.1.4.1.2.68 = INTEGER: 68
-iso.3.6.1.2.1.17.1.4.1.2.69 = INTEGER: 69
-iso.3.6.1.2.1.17.1.4.1.2.70 = INTEGER: 70
-iso.3.6.1.2.1.17.1.4.1.2.71 = INTEGER: 71
-iso.3.6.1.2.1.17.1.4.1.2.72 = INTEGER: 72
-iso.3.6.1.2.1.17.1.4.1.2.73 = INTEGER: 73
-iso.3.6.1.2.1.17.1.4.1.2.74 = INTEGER: 74
-iso.3.6.1.2.1.17.1.4.1.2.75 = INTEGER: 75
-iso.3.6.1.2.1.17.1.4.1.2.76 = INTEGER: 76
-iso.3.6.1.2.1.17.1.4.1.2.77 = INTEGER: 77
-iso.3.6.1.2.1.17.1.4.1.2.78 = INTEGER: 78
-iso.3.6.1.2.1.17.1.4.1.2.79 = INTEGER: 79
-iso.3.6.1.2.1.17.1.4.1.2.80 = INTEGER: 80
-iso.3.6.1.2.1.17.1.4.1.2.81 = INTEGER: 81
-iso.3.6.1.2.1.17.1.4.1.2.82 = INTEGER: 82
-iso.3.6.1.2.1.17.1.4.1.2.83 = INTEGER: 83
-iso.3.6.1.2.1.17.1.4.1.2.84 = INTEGER: 84
-iso.3.6.1.2.1.17.1.4.1.2.85 = INTEGER: 85
-iso.3.6.1.2.1.17.1.4.1.2.86 = INTEGER: 86
-iso.3.6.1.2.1.17.1.4.1.2.87 = INTEGER: 87
-iso.3.6.1.2.1.17.1.4.1.2.88 = INTEGER: 88
-iso.3.6.1.2.1.17.1.4.1.2.89 = INTEGER: 89
-iso.3.6.1.2.1.17.1.4.1.2.90 = INTEGER: 90
-iso.3.6.1.2.1.17.1.4.1.2.91 = INTEGER: 91
-iso.3.6.1.2.1.17.1.4.1.2.92 = INTEGER: 92
-iso.3.6.1.2.1.17.1.4.1.2.93 = INTEGER: 93
-iso.3.6.1.2.1.17.1.4.1.2.94 = INTEGER: 94
-iso.3.6.1.2.1.17.1.4.1.2.95 = INTEGER: 95
-iso.3.6.1.2.1.17.1.4.1.2.96 = INTEGER: 96
-iso.3.6.1.2.1.17.1.4.1.2.97 = INTEGER: 97
-iso.3.6.1.2.1.17.1.4.1.2.98 = INTEGER: 98
-iso.3.6.1.2.1.17.1.4.1.2.99 = INTEGER: 99
-iso.3.6.1.2.1.17.1.4.1.2.100 = INTEGER: 100
-iso.3.6.1.2.1.17.1.4.1.2.101 = INTEGER: 101
-iso.3.6.1.2.1.17.1.4.1.2.102 = INTEGER: 102
-iso.3.6.1.2.1.17.1.4.1.2.103 = INTEGER: 103
-iso.3.6.1.2.1.17.1.4.1.2.104 = INTEGER: 104
-iso.3.6.1.2.1.17.1.4.1.2.105 = INTEGER: 105
-iso.3.6.1.2.1.17.1.4.1.2.106 = INTEGER: 106
-iso.3.6.1.2.1.17.1.4.1.2.107 = INTEGER: 107
-iso.3.6.1.2.1.17.1.4.1.2.108 = INTEGER: 108
-iso.3.6.1.2.1.17.1.4.1.2.109 = INTEGER: 109
-iso.3.6.1.2.1.17.1.4.1.2.110 = INTEGER: 110
-iso.3.6.1.2.1.17.1.4.1.2.111 = INTEGER: 111
-iso.3.6.1.2.1.17.1.4.1.2.112 = INTEGER: 112
-iso.3.6.1.2.1.17.1.4.1.2.113 = INTEGER: 113
-iso.3.6.1.2.1.17.1.4.1.2.114 = INTEGER: 114
-iso.3.6.1.2.1.17.1.4.1.2.115 = INTEGER: 115
-iso.3.6.1.2.1.17.1.4.1.2.116 = INTEGER: 116
-iso.3.6.1.2.1.17.1.4.1.2.117 = INTEGER: 117
-iso.3.6.1.2.1.17.1.4.1.2.118 = INTEGER: 118
-iso.3.6.1.2.1.17.1.4.1.2.119 = INTEGER: 119
-iso.3.6.1.2.1.17.1.4.1.2.120 = INTEGER: 120
-iso.3.6.1.2.1.17.1.4.1.2.290 = INTEGER: 290
-
-=== Interface Descriptions ===
-iso.3.6.1.2.1.2.2.1.2.49 = STRING: "C1"
-iso.3.6.1.2.1.2.2.1.2.50 = STRING: "C2"
-iso.3.6.1.2.1.2.2.1.2.51 = STRING: "C3"
-iso.3.6.1.2.1.2.2.1.2.52 = STRING: "C4"
-iso.3.6.1.2.1.2.2.1.2.53 = STRING: "C5"
-iso.3.6.1.2.1.2.2.1.2.54 = STRING: "C6"
-iso.3.6.1.2.1.2.2.1.2.55 = STRING: "C7"
-iso.3.6.1.2.1.2.2.1.2.56 = STRING: "C8"
-iso.3.6.1.2.1.2.2.1.2.57 = STRING: "C9"
-iso.3.6.1.2.1.2.2.1.2.58 = STRING: "C10"
-iso.3.6.1.2.1.2.2.1.2.59 = STRING: "C11"
-iso.3.6.1.2.1.2.2.1.2.60 = STRING: "C12"
-iso.3.6.1.2.1.2.2.1.2.61 = STRING: "C13"
-iso.3.6.1.2.1.2.2.1.2.62 = STRING: "C14"
-iso.3.6.1.2.1.2.2.1.2.63 = STRING: "C15"
-iso.3.6.1.2.1.2.2.1.2.64 = STRING: "C16"
-iso.3.6.1.2.1.2.2.1.2.65 = STRING: "C17"
-iso.3.6.1.2.1.2.2.1.2.66 = STRING: "C18"
-iso.3.6.1.2.1.2.2.1.2.67 = STRING: "C19"
-iso.3.6.1.2.1.2.2.1.2.68 = STRING: "C20"
-iso.3.6.1.2.1.2.2.1.2.69 = STRING: "C21"
-iso.3.6.1.2.1.2.2.1.2.70 = STRING: "C22"
-iso.3.6.1.2.1.2.2.1.2.71 = STRING: "C23"
-iso.3.6.1.2.1.2.2.1.2.72 = STRING: "C24"
-iso.3.6.1.2.1.2.2.1.2.73 = STRING: "D1"
-iso.3.6.1.2.1.2.2.1.2.74 = STRING: "D2"
-iso.3.6.1.2.1.2.2.1.2.75 = STRING: "D3"
-iso.3.6.1.2.1.2.2.1.2.76 = STRING: "D4"
-iso.3.6.1.2.1.2.2.1.2.77 = STRING: "D5"
-iso.3.6.1.2.1.2.2.1.2.78 = STRING: "D6"
-iso.3.6.1.2.1.2.2.1.2.79 = STRING: "D7"
-iso.3.6.1.2.1.2.2.1.2.80 = STRING: "D8"
-iso.3.6.1.2.1.2.2.1.2.81 = STRING: "D9"
-iso.3.6.1.2.1.2.2.1.2.82 = STRING: "D10"
-iso.3.6.1.2.1.2.2.1.2.83 = STRING: "D11"
-iso.3.6.1.2.1.2.2.1.2.84 = STRING: "D12"
-iso.3.6.1.2.1.2.2.1.2.85 = STRING: "D13"
-iso.3.6.1.2.1.2.2.1.2.86 = STRING: "D14"
-iso.3.6.1.2.1.2.2.1.2.87 = STRING: "D15"
-iso.3.6.1.2.1.2.2.1.2.88 = STRING: "D16"
-iso.3.6.1.2.1.2.2.1.2.89 = STRING: "D17"
-iso.3.6.1.2.1.2.2.1.2.90 = STRING: "D18"
-iso.3.6.1.2.1.2.2.1.2.91 = STRING: "D19"
-iso.3.6.1.2.1.2.2.1.2.92 = STRING: "D20"
-iso.3.6.1.2.1.2.2.1.2.93 = STRING: "D21"
-iso.3.6.1.2.1.2.2.1.2.94 = STRING: "D22"
-iso.3.6.1.2.1.2.2.1.2.95 = STRING: "D23"
-iso.3.6.1.2.1.2.2.1.2.96 = STRING: "D24"
-iso.3.6.1.2.1.2.2.1.2.97 = STRING: "E1"
-iso.3.6.1.2.1.2.2.1.2.98 = STRING: "E2"
-iso.3.6.1.2.1.2.2.1.2.99 = STRING: "E3"
-iso.3.6.1.2.1.2.2.1.2.100 = STRING: "E4"
-iso.3.6.1.2.1.2.2.1.2.101 = STRING: "E5"
-iso.3.6.1.2.1.2.2.1.2.102 = STRING: "E6"
-iso.3.6.1.2.1.2.2.1.2.103 = STRING: "E7"
-iso.3.6.1.2.1.2.2.1.2.104 = STRING: "E8"
-iso.3.6.1.2.1.2.2.1.2.105 = STRING: "E9"
-iso.3.6.1.2.1.2.2.1.2.106 = STRING: "E10"
-iso.3.6.1.2.1.2.2.1.2.107 = STRING: "E11"
-iso.3.6.1.2.1.2.2.1.2.108 = STRING: "E12"
-iso.3.6.1.2.1.2.2.1.2.109 = STRING: "E13"
-iso.3.6.1.2.1.2.2.1.2.110 = STRING: "E14"
-iso.3.6.1.2.1.2.2.1.2.111 = STRING: "E15"
-iso.3.6.1.2.1.2.2.1.2.112 = STRING: "E16"
-iso.3.6.1.2.1.2.2.1.2.113 = STRING: "E17"
-iso.3.6.1.2.1.2.2.1.2.114 = STRING: "E18"
-iso.3.6.1.2.1.2.2.1.2.115 = STRING: "E19"
-iso.3.6.1.2.1.2.2.1.2.116 = STRING: "E20"
-iso.3.6.1.2.1.2.2.1.2.117 = STRING: "E21"
-iso.3.6.1.2.1.2.2.1.2.118 = STRING: "E22"
-iso.3.6.1.2.1.2.2.1.2.119 = STRING: "E23"
-iso.3.6.1.2.1.2.2.1.2.120 = STRING: "E24"
-iso.3.6.1.2.1.2.2.1.2.290 = STRING: "Trk1"
-iso.3.6.1.2.1.2.2.1.2.578 = STRING: "DEFAULT_VLAN"
-iso.3.6.1.2.1.2.2.1.2.588 = STRING: "VLAN11"
-iso.3.6.1.2.1.2.2.1.2.589 = STRING: "VLAN12"
-iso.3.6.1.2.1.2.2.1.2.590 = STRING: "VLAN13"
-iso.3.6.1.2.1.2.2.1.2.592 = STRING: "VLAN15"
-iso.3.6.1.2.1.2.2.1.2.609 = STRING: "VLAN32"
-iso.3.6.1.2.1.2.2.1.2.627 = STRING: "VLAN50"
-iso.3.6.1.2.1.2.2.1.2.3577 = STRING: "VLAN3000"
-iso.3.6.1.2.1.2.2.1.2.3581 = STRING: "VLAN3004"
-iso.3.6.1.2.1.2.2.1.2.3582 = STRING: "VLAN3005"
-iso.3.6.1.2.1.2.2.1.2.4800 = STRING: "HP Switch software loopback interface"
-iso.3.6.1.2.1.2.2.1.2.4801 = STRING: "HP Switch software loopback interface"
-iso.3.6.1.2.1.2.2.1.2.4802 = STRING: "HP Switch software loopback interface"
-iso.3.6.1.2.1.2.2.1.2.4803 = STRING: "HP Switch software loopback interface"
-iso.3.6.1.2.1.2.2.1.2.4804 = STRING: "HP Switch software loopback interface"
-iso.3.6.1.2.1.2.2.1.2.4805 = STRING: "HP Switch software loopback interface"
-iso.3.6.1.2.1.2.2.1.2.4806 = STRING: "HP Switch software loopback interface"
-iso.3.6.1.2.1.2.2.1.2.4807 = STRING: "HP Switch software loopback interface"
