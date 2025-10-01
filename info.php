@@ -2,19 +2,28 @@
 $switch_ip = "192.168.53.10";
 $community = "public";
 
-// Get bridge port numbers for MAC addresses (dot1dTpFdbPort)
-$ports = snmpwalk($switch_ip, $community, ".1.3.6.1.2.1.17.4.3.1.2");
+// Alternative approach with different OIDs
+try {
+    // Get MAC address table
+    $ports = snmpwalkoid($switch_ip, $community, ".1.3.6.1.2.1.17.4.3.1.2");
+    
+    // Get port to interface mapping using different OIDs
+    $port_ifindex = snmpwalkoid($switch_ip, $community, ".1.3.6.1.2.1.17.1.4.1.2");
+    
+    // Get interface descriptions
+    $interfaces = snmpwalkoid($switch_ip, $community, ".1.3.6.1.2.1.2.2.1.2");
+    
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage() . "\n";
+    exit;
+}
 
-// Get bridge port to ifIndex mapping (dot1dBasePortIfIndex)
-$port_ifindex = snmpwalk($switch_ip, $community, ".1.3.6.1.2.1.17.1.4.1.2");
-
-// Get interface names (ifDescr)
-$interfaces = snmpwalk($switch_ip, $community, ".1.3.6.1.2.1.2.2.1.2");
-
-// Parse MAC addresses and port numbers
+// Parse data
 $mac_to_port = [];
+$port_to_interface = [];
+
+// Parse MAC addresses
 foreach ($ports as $oid => $value) {
-    // Extract MAC address from OID (last 6 parts)
     $oid_parts = explode('.', $oid);
     $mac_parts = array_slice($oid_parts, -6);
     
@@ -22,35 +31,44 @@ foreach ($ports as $oid => $value) {
         return str_pad(dechex($part), 2, '0', STR_PAD_LEFT);
     }, $mac_parts));
     
-    // Extract port number from value (remove "INTEGER: ")
-    $port_number = intval(str_replace('INTEGER: ', '', $value));
-    $mac_to_port[$mac] = $port_number;
+    $mac_to_port[$mac] = intval($value);
 }
 
-// Map bridge ports to interface names
-$port_to_interface = [];
+// Parse port to interface mapping
 foreach ($port_ifindex as $oid => $value) {
-    // Extract bridge port from OID (last part)
     $oid_parts = explode('.', $oid);
     $bridge_port = end($oid_parts);
+    $port_to_interface[$bridge_port] = intval($value);
+}
+
+// Parse interface names
+$ifindex_to_name = [];
+foreach ($interfaces as $oid => $value) {
+    $oid_parts = explode('.', $oid);
+    $ifindex = end($oid_parts);
+    $ifindex_to_name[$ifindex] = trim($value, '"');
+}
+
+// Create final mapping
+$final_mapping = [];
+foreach ($mac_to_port as $mac => $bridge_port) {
+    $interface_name = "Unknown";
     
-    // Extract ifIndex from value
-    $ifindex = intval(str_replace('INTEGER: ', '', $value));
-    
-    // Find interface name
-    foreach ($interfaces as $if_oid => $if_name) {
-        $if_oid_parts = explode('.', $if_oid);
-        $current_ifindex = end($if_oid_parts);
-        
-        if ($current_ifindex == $ifindex) {
-            $port_to_interface[$bridge_port] = str_replace('STRING: ', '', $if_name);
-            break;
+    if (isset($port_to_interface[$bridge_port])) {
+        $ifindex = $port_to_interface[$bridge_port];
+        if (isset($ifindex_to_name[$ifindex])) {
+            $interface_name = $ifindex_to_name[$ifindex];
         }
     }
+    
+    $final_mapping[$mac] = [
+        'bridge_port' => $bridge_port,
+        'interface' => $interface_name
+    ];
 }
 
 // Sort by MAC address
-ksort($mac_to_port);
+ksort($final_mapping);
 
 // Display results
 echo "MAC Address to Interface Mapping:\n";
@@ -58,24 +76,8 @@ echo str_repeat("-", 80) . "\n";
 printf("%-20s %-15s %-30s\n", "MAC Address", "Bridge Port", "Interface");
 echo str_repeat("-", 80) . "\n";
 
-foreach ($mac_to_port as $mac => $bridge_port) {
-    $interface = isset($port_to_interface[$bridge_port]) ? $port_to_interface[$bridge_port] : "Unknown";
-    printf("%-20s %-15d %-30s\n", $mac, $bridge_port, $interface);
+foreach ($final_mapping as $mac => $data) {
+    printf("%-20s %-15d %-30s\n", $mac, $data['bridge_port'], $data['interface']);
 }
 echo str_repeat("-", 80) . "\n";
-echo "Total MAC addresses: " . count($mac_to_port) . "\n";
-
-// Debug information
-echo "\nDebug Information:\n";
-echo "Port ifIndex entries: " . count($port_ifindex) . "\n";
-echo "Interface entries: " . count($interfaces) . "\n";
-echo "Port to Interface mappings: " . count($port_to_interface) . "\n";
-
-// Show available interfaces
-echo "\nAvailable Interfaces:\n";
-foreach ($interfaces as $oid => $if_name) {
-    $if_oid_parts = explode('.', $oid);
-    $ifindex = end($if_oid_parts);
-    echo "ifIndex $ifindex: " . str_replace('STRING: ', '', $if_name) . "\n";
-}
 ?>
