@@ -1,6 +1,6 @@
 <?php
-$switch_ip = "your_switch_ip";
-$community = "your_community";
+$switch_ip = "192.168.53.10";
+$community = "public";
 
 // Get bridge port numbers for MAC addresses (dot1dTpFdbPort)
 $ports = snmpwalk($switch_ip, $community, ".1.3.6.1.2.1.17.4.3.1.2");
