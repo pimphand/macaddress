@@ -1,63 +1,81 @@
 <?php
-$switch_ip = "192.168.53.10";
-$community = "public";
+$switch_ip = "your_switch_ip";
+$community = "your_community";
 
-// Get bridge port numbers for MAC addresses
-$ports = snmpwalk($switch_ip, $community, "1.3.6.1.2.1.17.4.3.1.2");
+// Get bridge port numbers for MAC addresses (dot1dTpFdbPort)
+$ports = snmpwalk($switch_ip, $community, ".1.3.6.1.2.1.17.4.3.1.2");
 
-// Get bridge port to ifIndex mapping
-$port_ifindex = snmpwalk($switch_ip, $community, "1.3.6.1.2.1.17.1.4.1.2");
+// Get bridge port to ifIndex mapping (dot1dBasePortIfIndex)
+$port_ifindex = snmpwalk($switch_ip, $community, ".1.3.6.1.2.1.17.1.4.1.2");
 
-// Get interface names
-$interfaces = snmpwalk($switch_ip, $community, "1.3.6.1.2.1.2.2.1.2");
+// Get interface names (ifDescr)
+$interfaces = snmpwalk($switch_ip, $community, ".1.3.6.1.2.1.2.2.1.2");
 
-// Parse the results
+// Parse MAC addresses and port numbers
 $mac_to_port = [];
-foreach ($ports as $oid => $port_number) {
-    // Extract MAC address from OID
-    $mac_parts = explode('.', $oid);
-    $mac_parts = array_slice($mac_parts, -6); // Last 6 parts are MAC address
+foreach ($ports as $oid => $value) {
+    // Extract MAC address from OID (last 6 parts)
+    $oid_parts = explode('.', $oid);
+    $mac_parts = array_slice($oid_parts, -6);
+    
     $mac = implode(':', array_map(function($part) {
         return str_pad(dechex($part), 2, '0', STR_PAD_LEFT);
     }, $mac_parts));
     
+    // Extract port number from value (remove "INTEGER: ")
+    $port_number = intval(str_replace('INTEGER: ', '', $value));
     $mac_to_port[$mac] = $port_number;
 }
 
 // Map bridge ports to interface names
 $port_to_interface = [];
-foreach ($port_ifindex as $bridge_port => $ifindex) {
-    if (isset($interfaces[$ifindex])) {
-        $port_to_interface[$bridge_port] = $interfaces[$ifindex];
+foreach ($port_ifindex as $oid => $value) {
+    // Extract bridge port from OID (last part)
+    $oid_parts = explode('.', $oid);
+    $bridge_port = end($oid_parts);
+    
+    // Extract ifIndex from value
+    $ifindex = intval(str_replace('INTEGER: ', '', $value));
+    
+    // Find interface name
+    foreach ($interfaces as $if_oid => $if_name) {
+        $if_oid_parts = explode('.', $if_oid);
+        $current_ifindex = end($if_oid_parts);
+        
+        if ($current_ifindex == $ifindex) {
+            $port_to_interface[$bridge_port] = str_replace('STRING: ', '', $if_name);
+            break;
+        }
     }
 }
 
+// Sort by MAC address
+ksort($mac_to_port);
+
 // Display results
 echo "MAC Address to Interface Mapping:\n";
+echo str_repeat("-", 80) . "\n";
+printf("%-20s %-15s %-30s\n", "MAC Address", "Bridge Port", "Interface");
+echo str_repeat("-", 80) . "\n";
+
 foreach ($mac_to_port as $mac => $bridge_port) {
     $interface = isset($port_to_interface[$bridge_port]) ? $port_to_interface[$bridge_port] : "Unknown";
-    echo "MAC: $mac → Bridge Port: $bridge_port → Interface: $interface\n";
+    printf("%-20s %-15d %-30s\n", $mac, $bridge_port, $interface);
+}
+echo str_repeat("-", 80) . "\n";
+echo "Total MAC addresses: " . count($mac_to_port) . "\n";
+
+// Debug information
+echo "\nDebug Information:\n";
+echo "Port ifIndex entries: " . count($port_ifindex) . "\n";
+echo "Interface entries: " . count($interfaces) . "\n";
+echo "Port to Interface mappings: " . count($port_to_interface) . "\n";
+
+// Show available interfaces
+echo "\nAvailable Interfaces:\n";
+foreach ($interfaces as $oid => $if_name) {
+    $if_oid_parts = explode('.', $oid);
+    $ifindex = end($if_oid_parts);
+    echo "ifIndex $ifindex: " . str_replace('STRING: ', '', $if_name) . "\n";
 }
 ?>
-MAC: 00 → Bridge Port: INTEGER: 104 → Interface: Unknown
-MAC: 01 → Bridge Port: INTEGER: 111 → Interface: Unknown
-MAC: 02 → Bridge Port: INTEGER: 111 → Interface: Unknown
-MAC: 03 → Bridge Port: INTEGER: 97 → Interface: Unknown
-MAC: 04 → Bridge Port: INTEGER: 108 → Interface: Unknown
-MAC: 05 → Bridge Port: INTEGER: 98 → Interface: Unknown
-MAC: 06 → Bridge Port: INTEGER: 112 → Interface: Unknown
-MAC: 07 → Bridge Port: INTEGER: 107 → Interface: Unknown
-MAC: 08 → Bridge Port: INTEGER: 112 → Interface: Unknown
-MAC: 09 → Bridge Port: INTEGER: 112 → Interface: Unknown
-MAC: 0a → Bridge Port: INTEGER: 115 → Interface: Unknown
-MAC: 0b → Bridge Port: INTEGER: 113 → Interface: Unknown
-MAC: 0c → Bridge Port: INTEGER: 0 → Interface: Unknown
-MAC: 0d → Bridge Port: INTEGER: 116 → Interface: Unknown
-MAC: 0e → Bridge Port: INTEGER: 115 → Interface: Unknown
-MAC: 0f → Bridge Port: INTEGER: 116 → Interface: Unknown
-MAC: 10 → Bridge Port: INTEGER: 115 → Interface: Unknown
-MAC: 11 → Bridge Port: INTEGER: 106 → Interface: Unknown
-MAC: 12 → Bridge Port: INTEGER: 105 → Interface: Unknown
-MAC: 13 → Bridge Port: INTEGER: 106 → Interface: Unknown
-MAC: 14 → Bridge Port: INTEGER: 102 → Interface: Unknown
-
