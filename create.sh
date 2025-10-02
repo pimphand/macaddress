@@ -1,14 +1,4 @@
- ping 192.168.53.10
-PING 192.168.53.10 (192.168.53.10) 56(84) bytes of data.
-From 192.168.53.191 icmp_seq=1 Destination Host Unreachable
-From 192.168.53.191 icmp_seq=2 Destination Host Unreachable
-From 192.168.53.191 icmp_seq=3 Destination Host Unreachable
-From 192.168.53.191 icmp_seq=4 Destination Host Unreachable
-From 192.168.53.191 icmp_seq=5 Destination Host Unreachable
-From 192.168.53.191 icmp_seq=6 Destination Host Unreachable
-From 192.168.53.191 icmp_seq=7 Destination Host Unreachable
-From 192.168.53.191 icmp_seq=8 Destination Host Unreachable
-From 192.168.53.191 icmp_seq=9 Destination Host Unreachable
-From 192.168.53.191 icmp_seq=10 Destination Host Unreachable
-From 192.168.53.191 icmp_seq=11 Destination Host Unreachable
-From 192.168.53.191 icmp_seq=12 Destination Host Unreachable
+ ip route
+default via 192.168.50.1 dev ens160 proto static metric 100 
+192.168.50.0/24 dev ens160 proto kernel scope link src 192.168.50.13 metric 100 
+192.168.53.0/24 dev vlan11 proto kernel scope link src 192.168.53.191 metric 400 
