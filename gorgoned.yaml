@@ -37,3 +37,7 @@ ls -l /etc/centreon-gorgone/config.d/40-gorgoned.yaml
 ls -ld /etc/centreon-gorgone/config.d
 chown centreon-gorgone:centreon-gorgone /etc/centreon-gorgone/config.d/40-gorgoned.yaml
 chmod 640 /etc/centreon-gorgone/config.d/40-gorgoned.yaml
+
+
+-rw-r--r-- 1 centreon-gorgone centreon-gorgone 1547 Oct  5 23:49 /etc/centreon-gorgone/config.d/40-gorgoned.yaml
+drwxrwxr-x 4 centreon-gorgone centreon-gorgone 4096 Oct  5 23:44 /etc/centreon-gorgone/config.d
