@@ -33,3 +33,7 @@ gorgone:
       command_file: "/var/lib/centreon-engine/rw/centengine.cmd"
 
 EOF
+ls -l /etc/centreon-gorgone/config.d/40-gorgoned.yaml
+ls -ld /etc/centreon-gorgone/config.d
+chown centreon-gorgone:centreon-gorgone /etc/centreon-gorgone/config.d/40-gorgoned.yaml
+chmod 640 /etc/centreon-gorgone/config.d/40-gorgoned.yaml
