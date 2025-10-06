@@ -1,18 +1,27 @@
-cat <<EOF > /etc/centreon-gorgone/config.d/40-gorgoned.yaml
-name:  gorgoned-poller-192-168-50-13
-description: Configuration for poller poller-192-168-50-13
+name: gorgoned-poller-53-10
+description: Configuration for remote server poller-53-10
 gorgone:
   gorgonecore:
-    id: 342
-    external_com_type: tcp
-    external_com_path: "*:5556"
-    authorized_clients: 
     privkey: "/var/lib/centreon-gorgone/.keys/rsakey.priv.pem"
     pubkey: "/var/lib/centreon-gorgone/.keys/rsakey.pub.pem"
+    id: 345
   modules:
-    - name: action
-      package: gorgone::modules::core::action::hooks
+    - name: httpserver
+      package: "gorgone::modules::core::httpserver::hooks"
       enable: true
+      address: "0.0.0.0"
+      port: "8085"
+      ssl: false
+      auth:
+        enabled: false
+      allowed_hosts:
+        enabled: true
+        subnets:
+          - 127.0.0.1/32
+    - name: action
+      package: "gorgone::modules::core::action::hooks"
+      enable: true
+      command_timeout: 30
       whitelist_cmds: true
       allowed_cmds:
         - ^sudo\s+(/bin/)?systemctl\s+(reload|restart)\s+(centengine|centreontrapd|cbd)\s*$
@@ -26,20 +35,40 @@ gorgone:
         - ^mkdir
         - ^/usr/share/centreon/www/modules/centreon-autodiscovery-server/script/run_save_discovered_host
         - ^/usr/share/centreon/bin/centreon -u \"centreon-gorgone\" -p \S+ -w -o CentreonWorker -a processQueue$
-
+    - name: cron
+      package: "gorgone::modules::core::cron::hooks"
+      enable: true
+      cron: !include cron.d/*.yaml
+    - name: nodes
+      package: "gorgone::modules::centreon::nodes::hooks"
+      enable: true
+    - name: proxy
+      package: "gorgone::modules::core::proxy::hooks"
+      enable: true
+    - name: legacycmd
+      package: "gorgone::modules::centreon::legacycmd::hooks"
+      enable: true
+      cmd_dir: "/var/lib/centreon/centcore/"
+      cmd_file: "/var/lib/centreon/centcore.cmd"
+      cache_dir: "/var/cache/centreon"
+      cache_dir_trap: "/etc/snmp/centreon_traps"
+      remote_dir: "/var/cache/centreon/config/remote-data/"
     - name: engine
-      package: gorgone::modules::centreon::engine::hooks
+      package: "gorgone::modules::centreon::engine::hooks"
       enable: true
       command_file: "/var/lib/centreon-engine/rw/centengine.cmd"
-
-EOF
-ls -l /etc/centreon-gorgone/config.d/40-gorgoned.yaml
-ls -ld /etc/centreon-gorgone/config.d
-chown centreon-gorgone:centreon-gorgone /etc/centreon-gorgone/config.d/40-gorgoned.yaml
-chmod 640 /etc/centreon-gorgone/config.d/40-gorgoned.yaml
-https://nms-dev.awetonet.io/centreon/main.php?p=60903&o=c&nagios_id=343
-
--rw-r--r-- 1 centreon-gorgone centreon-gorgone 1547 Oct  5 23:49 /etc/centreon-gorgone/config.d/40-gorgoned.yaml
-drwxrwxr-x 4 centreon-gorgone centreon-gorgone 4096 Oct  5 23:44 /etc/centreon-gorgone/config.d
-
-https://docs.centreon.com/docs/monitoring/monitoring-servers/add-a-poller-to-configuration/
+    - name: statistics
+      package: "gorgone::modules::centreon::statistics::hooks"
+      enable: true
+      broker_cache_dir: "/var/cache/centreon/broker-stats/"
+      cron:
+        - id: broker_stats
+          timespec: "*/5 * * * *"
+          action: BROKERSTATS
+          parameters:
+            timeout: 10
+        - id: engine_stats
+          timespec: "*/5 * * * *"
+          action: ENGINESTATS
+          parameters:
+            timeout: 10
