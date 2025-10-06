@@ -1,23 +1,30 @@
-name: gorgoned-poller-53-10
-description: Configuration for remote server poller-53-10
+tee /etc/centreon-gorgone/config.d/40-gorgoned.yaml > /dev/null <<'EOF'
+name: gorgoned-central
+description: Configuration for Centreon Central Server
+
 gorgone:
   gorgonecore:
+    id: 1
     privkey: "/var/lib/centreon-gorgone/.keys/rsakey.priv.pem"
     pubkey: "/var/lib/centreon-gorgone/.keys/rsakey.pub.pem"
-    id: 345
+    external_com_type: tcp
+    external_com_path: "0.0.0.0:5556"
+    authorized_clients:
+      - 127.0.0.1
+      - 192.168.53.10
+
+  shared_secret: "MySuperSecretKey12345"
+
   modules:
     - name: httpserver
       package: "gorgone::modules::core::httpserver::hooks"
       enable: true
       address: "0.0.0.0"
-      port: "8085"
+      port: 8085
       ssl: false
       auth:
         enabled: false
-      allowed_hosts:
-        enabled: true
-        subnets:
-          - 127.0.0.1/32
+
     - name: action
       package: "gorgone::modules::core::action::hooks"
       enable: true
@@ -28,23 +35,23 @@ gorgone:
         - ^(sudo\s+)?(/usr/bin/)?service\s+(centengine|centreontrapd|cbd|cbd-sql)\s+(reload|restart)\s*$
         - ^/usr/sbin/centenginestats\s+-c\s+/etc/centreon-engine/centengine\.cfg\s*$
         - ^cat\s+/var/lib/centreon-engine/[a-zA-Z0-9\-]+-stats\.json\s*$
-        - ^/usr/lib/centreon/plugins/.*$
-        - ^/bin/perl /usr/share/centreon/bin/anomaly_detection --seasonality >> /var/log/centreon/anomaly_detection\.log 2>&1\s*$
-        - ^/usr/bin/php -q /usr/share/centreon/cron/centreon-helios\.php >> /var/log/centreon-helios\.log 2>&1\s*$
-        - ^centreon
-        - ^mkdir
-        - ^/usr/share/centreon/www/modules/centreon-autodiscovery-server/script/run_save_discovered_host
-        - ^/usr/share/centreon/bin/centreon -u \"centreon-gorgone\" -p \S+ -w -o CentreonWorker -a processQueue$
+
     - name: cron
       package: "gorgone::modules::core::cron::hooks"
       enable: true
       cron: !include cron.d/*.yaml
+
     - name: nodes
       package: "gorgone::modules::centreon::nodes::hooks"
       enable: true
+      ssh:
+        user: centreon-gorgone
+      remote_dir: "/var/lib/centreon-gorgone/.keys/"
+
     - name: proxy
       package: "gorgone::modules::core::proxy::hooks"
       enable: true
+
     - name: legacycmd
       package: "gorgone::modules::centreon::legacycmd::hooks"
       enable: true
@@ -53,22 +60,11 @@ gorgone:
       cache_dir: "/var/cache/centreon"
       cache_dir_trap: "/etc/snmp/centreon_traps"
       remote_dir: "/var/cache/centreon/config/remote-data/"
+
     - name: engine
       package: "gorgone::modules::centreon::engine::hooks"
       enable: true
       command_file: "/var/lib/centreon-engine/rw/centengine.cmd"
-    - name: statistics
-      package: "gorgone::modules::centreon::statistics::hooks"
-      enable: true
-      broker_cache_dir: "/var/cache/centreon/broker-stats/"
-      cron:
-        - id: broker_stats
-          timespec: "*/5 * * * *"
-          action: BROKERSTATS
-          parameters:
-            timeout: 10
-        - id: engine_stats
-          timespec: "*/5 * * * *"
-          action: ENGINESTATS
-          parameters:
-            timeout: 10
+EOF
+
+systemctl restart gorgoned
