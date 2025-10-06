@@ -41,3 +41,5 @@ https://nms-dev.awetonet.io/centreon/main.php?p=60903&o=c&nagios_id=343
 
 -rw-r--r-- 1 centreon-gorgone centreon-gorgone 1547 Oct  5 23:49 /etc/centreon-gorgone/config.d/40-gorgoned.yaml
 drwxrwxr-x 4 centreon-gorgone centreon-gorgone 4096 Oct  5 23:44 /etc/centreon-gorgone/config.d
+
+https://docs.centreon.com/docs/monitoring/monitoring-servers/add-a-poller-to-configuration/
