@@ -1,12 +1,13 @@
 cat <<EOF > /etc/centreon-gorgone/config.d/40-gorgoned.yaml
-name:  gorgoned-Central
-description: Configuration for poller Central
+name:  gorgoned-localhost
+description: Configuration for poller localhost
 gorgone:
   gorgonecore:
-    id: 1
+    id: 359
     external_com_type: tcp
-    external_com_path: "*:"
+    external_com_path: "*:5556"
     authorized_clients: 
+      - key: vhmfs8BaX3YoeR-R2Zucyy7mjiqlO4G9505e3JkN0Ec
     privkey: "/var/lib/centreon-gorgone/.keys/rsakey.priv.pem"
     pubkey: "/var/lib/centreon-gorgone/.keys/rsakey.pub.pem"
   modules:
@@ -30,6 +31,6 @@ gorgone:
     - name: engine
       package: gorgone::modules::centreon::engine::hooks
       enable: true
-      command_file: ""
+      command_file: "/var/lib/centreon-engine/rw/centengine.cmd"
 
 EOF
