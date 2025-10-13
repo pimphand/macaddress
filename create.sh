@@ -1,26 +1,32 @@
-su - centreon-broker -s /bin/bash
-/usr/sbin/cbd -v -C /etc/centreon-broker/central-broker.json
-exit
+sudo tee /etc/centreon-broker/dwiki.json >/dev/null <<'JSON'
+{
+  "daemon": {
+    "event_queue_max_size": 100000
+  },
+  "log": {
+    "level": "info",
+    "type": "file",
+    "filename": "/var/log/centreon-broker/dwiki.log"
+  },
+  "input": [
+    {
+      "name": "central-collector",
+      "type": "memory"
+    }
+  ],
+  "output": [
+    {
+      "name": "to-central",
+      "type": "tcp",
+      "host": "118.201.5.173",
+      "port": 5669,
+      "failover": false,
+      "compression": "lz4"
+    }
+  ]
+}
+JSON
 
-sudo -u centreon-broker /usr/sbin/cbd -v -c /etc/centreon-broker/central-broker.json
-
-
-cat <<EOF > /etc/centreon-gorgone/config.d/40-gorgoned.yaml
-name:  gorgoned-poller-50-13
-description: Configuration for poller poller-50-13
-gorgone:
-  gorgonecore:
-    id: 8
-    external_com_type: tcp
-    external_com_path: "*:5556"
-    authorized_clients: 
-      - key: 1bi0QLwo55Zp0AJvv87wODy5fy3Zn7raNOWiiePGx5A
-    privkey: "/var/lib/centreon-gorgone/.keys/rsakey.priv.pem"
-    pubkey: "/var/lib/centreon-gorgone/.keys/rsakey.pub.pem"
-  modules:
-    - name: engine
-      package: gorgone::modules::centreon::engine::hooks
-      enable: true
-      command_file: "/var/lib/centreon-engine/rw/centengine.cmd"
-
-EOF
+sudo mkdir -p /var/log/centreon-broker
+sudo chown -R centreon-broker:centreon-broker /etc/centreon-broker /var/log/centreon-broker
+sudo chmod 750 /etc/centreon-broker
