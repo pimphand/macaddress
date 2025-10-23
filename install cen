@@ -61,3 +61,7 @@ snmpget -v2c -c public 192.168.53.10 1.3.6.1.2.1.1.1.0
 apt install centreon-pack-network-switchs-hp-procurve-snmp
 apt install centreon-plugin-network-switchs-hp-procurve-snmp
 
+/usr/lib/centreon/plugins/centreon_hp_procurve.pl \
+	--plugin=network::hp::procurve::snmp::plugin \
+	--list-mode
+
