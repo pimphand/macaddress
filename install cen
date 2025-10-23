@@ -21,3 +21,4 @@ snmpwalk -v2c -c public 192.168.53.10 IF-MIB::ifDescr
 # Ambil counter spesifik (mis. interface index 5)
 snmpget -v2c -c public 192.168.53.10 IF-MIB::ifHCInOctets.5 IF-MIB::ifHCOutOctets.5
 
+snmpget -v2c -c public 192.168.53.10 SNMPv2-MIB::sysName.0
