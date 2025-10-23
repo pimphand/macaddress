@@ -40,3 +40,7 @@ sudo apt install centreon-plugins -y
 /usr/lib/centreon/centreon-plugins/src/centreon_plugins.pl \
   --plugin=network::generic::snmp::plugin \
   --list-mode
+
+ls /usr/lib/centreon/centreon-plugins/src/plugins
+ls /usr/lib/centreon/centreon-plugins/src/network
+
