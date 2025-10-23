@@ -49,3 +49,13 @@ find /usr/lib/centreon -type f -name plugin.pm | grep snmp
 
 apt install centreon-plugin-network-cisco-standard-snmp
 
+/usr/lib/centreon/centreon-plugins/centreon_plugins.pl \
+  --plugin=network::generic::snmp::plugin \
+  --mode=interfaces \
+  --hostname=192.168.53.10 \
+  --snmp-community=public \
+  --snmp-version=2c
+
+snmpget -v2c -c public 192.168.53.10 SNMPv2-MIB::sysDescr.0
+snmpget -v2c -c public 192.168.53.10 1.3.6.1.2.1.1.1.0
+
