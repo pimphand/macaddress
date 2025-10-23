@@ -14,3 +14,10 @@ apt install centreon-plugin-applications-protocol-snmp
 /usr/lib/centreon/plugins//centreon_generic_snmp.pl \
 	--plugin=apps::protocols::snmp::plugin \
 	--list-mode
+
+# Lihat daftar interface (pakai community 'public' dan IP switch 192.168.53.10)
+snmpwalk -v2c -c public 192.168.53.10 IF-MIB::ifDescr
+
+# Ambil counter spesifik (mis. interface index 5)
+snmpget -v2c -c public 192.168.53.10 IF-MIB::ifHCInOctets.5 IF-MIB::ifHCOutOctets.5
+
