@@ -45,3 +45,4 @@ ls /usr/lib/centreon/centreon-plugins/src/plugins
 ls /usr/lib/centreon/centreon-plugins/src/network
 
 sudo apt install centreon-plugins -y
+find /usr/lib/centreon -type f -name plugin.pm | grep snmp
