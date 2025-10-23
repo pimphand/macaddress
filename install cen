@@ -1,0 +1,5 @@
+# Tambahkan key GPG Centreon
+wget -O- https://apt.centreon.com/centreon.gpg | gpg --dearmor -o /usr/share/keyrings/centreon-archive-keyring.gpg
+
+# Tambahkan repository Centreon Bookworm
+echo "deb [signed-by=/usr/share/keyrings/centreon-archive-keyring.gpg] https://apt.centreon.com/repository/debian bookworm main" > /etc/apt/sources.list.d/centreon.list
