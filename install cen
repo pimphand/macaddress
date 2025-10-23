@@ -46,3 +46,6 @@ ls /usr/lib/centreon/centreon-plugins/src/network
 
 sudo apt install centreon-plugins -y
 find /usr/lib/centreon -type f -name plugin.pm | grep snmp
+
+apt install centreon-plugin-network-cisco-standard-snmp
+
