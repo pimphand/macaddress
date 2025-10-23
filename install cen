@@ -36,4 +36,4 @@ sudo apt install centreon-plugins -y
   --hostname=192.168.53.10 \
   --snmp-community=public \
   --snmp-version=2c
-
+find / -name centreon_plugins.pl 2>/dev/null
