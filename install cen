@@ -29,3 +29,11 @@ snmpget -v2c -c public 192.168.53.10 1.3.6.1.2.1.1.5.0
 sudo yum install centreon-pack-network-switch-snmp -y      # untuk CentOS/RHEL
 sudo apt install centreon-pack-network-switch-snmp -y      # untuk Debian/Ubuntu (jika tersedia)
 sudo apt install centreon-plugins -y 
+
+/usr/lib/centreon/plugins/centreon_plugins.pl \
+  --plugin=network::cisco::standard::snmp::plugin \
+  --mode=interfaces \
+  --hostname=192.168.53.10 \
+  --snmp-community=public \
+  --snmp-version=2c
+
