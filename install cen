@@ -22,3 +22,5 @@ snmpwalk -v2c -c public 192.168.53.10 IF-MIB::ifDescr
 snmpget -v2c -c public 192.168.53.10 IF-MIB::ifHCInOctets.5 IF-MIB::ifHCOutOctets.5
 
 snmpget -v2c -c public 192.168.53.10 SNMPv2-MIB::sysName.0
+
+snmpget -v2c -c public 192.168.53.10 1.3.6.1.2.1.1.5.0
