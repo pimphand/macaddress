@@ -10,3 +10,7 @@ apt install centreon-plugin-Network-Switch-SNMP -y
 deb [signed-by=/usr/share/keyrings/centreon-archive-keyring.gpg] https://apt.centreon.com/repository/debian bookworm main
 
 apt install centreon-plugin-applications-protocol-snmp
+
+/usr/lib/centreon/plugins//centreon_generic_snmp.pl \
+	--plugin=apps::protocols::snmp::plugin \
+	--list-mode
