@@ -37,3 +37,6 @@ sudo apt install centreon-plugins -y
   --snmp-version=2c \
   --snmp-community=public
 
+/usr/lib/centreon/centreon-plugins/src/centreon_plugins.pl \
+  --plugin=network::generic::snmp::plugin \
+  --list-mode
