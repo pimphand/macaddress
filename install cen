@@ -44,3 +44,4 @@ sudo apt install centreon-plugins -y
 ls /usr/lib/centreon/centreon-plugins/src/plugins
 ls /usr/lib/centreon/centreon-plugins/src/network
 
+sudo apt install centreon-plugins -y
