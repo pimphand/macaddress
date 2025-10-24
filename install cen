@@ -1,3 +1,5 @@
+/usr/lib/centreon/plugins/centreon_hp_procurve.pl --list-mode
+#Trafic
 /usr/lib/centreon/plugins/centreon_hp_procurve.pl \
   --plugin=network::hp::procurve::snmp::plugin \
   --mode=interfaces \
