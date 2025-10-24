@@ -1,5 +1,7 @@
 /usr/lib/centreon/plugins/centreon_hp_procurve.pl --list-mode
-#Trafic
+# =======================
+# 🔹 INTERFACES (Status & Traffic Monitoring)
+# =======================
 /usr/lib/centreon/plugins/centreon_hp_procurve.pl \
   --plugin=network::hp::procurve::snmp::plugin \
   --mode=interfaces \
@@ -7,3 +9,91 @@
   --snmp-version=2c \
   --snmp-community=public \
   --name --add-status --add-traffic
+
+
+# =======================
+# 🔹 CPU USAGE
+# =======================
+/usr/lib/centreon/plugins/centreon_hp_procurve.pl \
+  --plugin=network::hp::procurve::snmp::plugin \
+  --mode=cpu \
+  --hostname=192.168.53.10 \
+  --snmp-version=2c \
+  --snmp-community=public
+
+
+# =======================
+# 🔹 MEMORY USAGE
+# =======================
+/usr/lib/centreon/plugins/centreon_hp_procurve.pl \
+  --plugin=network::hp::procurve::snmp::plugin \
+  --mode=memory \
+  --hostname=192.168.53.10 \
+  --snmp-version=2c \
+  --snmp-community=public
+
+
+# =======================
+# 🔹 ENVIRONMENT (Fans, Power Supplies, Temperature)
+# =======================
+/usr/lib/centreon/plugins/centreon_hp_procurve.pl \
+  --plugin=network::hp::procurve::snmp::plugin \
+  --mode=environment \
+  --hostname=192.168.53.10 \
+  --snmp-version=2c \
+  --snmp-community=public
+
+
+# =======================
+# 🔹 UPTIME (System Running Time)
+# =======================
+/usr/lib/centreon/plugins/centreon_hp_procurve.pl \
+  --plugin=network::hp::procurve::snmp::plugin \
+  --mode=uptime \
+  --hostname=192.168.53.10 \
+  --snmp-version=2c \
+  --snmp-community=public
+
+
+# =======================
+# 🔹 SPANNING TREE STATUS
+# =======================
+/usr/lib/centreon/plugins/centreon_hp_procurve.pl \
+  --plugin=network::hp::procurve::snmp::plugin \
+  --mode=spanning-tree \
+  --hostname=192.168.53.10 \
+  --snmp-version=2c \
+  --snmp-community=public
+
+
+# =======================
+# 🔹 LIST ALL INTERFACES
+# =======================
+/usr/lib/centreon/plugins/centreon_hp_procurve.pl \
+  --plugin=network::hp::procurve::snmp::plugin \
+  --mode=list-interfaces \
+  --hostname=192.168.53.10 \
+  --snmp-version=2c \
+  --snmp-community=public
+
+
+# =======================
+# 🔹 STACK INFORMATION (Stacked Switch Status)
+# =======================
+/usr/lib/centreon/plugins/centreon_hp_procurve.pl \
+  --plugin=network::hp::procurve::snmp::plugin \
+  --mode=stack \
+  --hostname=192.168.53.10 \
+  --snmp-version=2c \
+  --snmp-community=public
+
+
+# =======================
+# 🔹 VIRTUAL CHASSIS STATUS
+# =======================
+/usr/lib/centreon/plugins/centreon_hp_procurve.pl \
+  --plugin=network::hp::procurve::snmp::plugin \
+  --mode=virtual-chassis \
+  --hostname=192.168.53.10 \
+  --snmp-version=2c \
+  --snmp-community=public
