@@ -1,1 +1,2 @@
 (atau di Debian/Ubuntu: apt install centreon-plugin-Network-Switchs-Hp-Procurve-Snmp
+dpkg -L centreon-plugin-Network-Switchs-Hp-Procurve-Snmp | grep procurve
