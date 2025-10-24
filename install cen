@@ -1,10 +1,7 @@
-/usr/lib/centreon/plugins/centreon_hp_procurve_snmp.pl \
+/usr/lib/centreon-plugins/centreon_hp_procurve_snmp.pl \
   --plugin=network::hp::procurve::snmp::plugin \
   --mode=interfaces \
-  --hostname=$HOSTADDRESS$ \
-  --snmp-version=$ARG1$ \
-  --snmp-community=$ARG2$ \
-  --name \
-  --interface='E1' \
-  --add-status \
-  --add-traffic
+  --hostname=192.168.53.10 \
+  --snmp-version=2c \
+  --snmp-community=public \
+  --name --add-status --add-traffic
