@@ -1,2 +1,7 @@
-(atau di Debian/Ubuntu: apt install centreon-plugin-Network-Switchs-Hp-Procurve-Snmp
-dpkg -L centreon-plugin-Network-Switchs-Hp-Procurve-Snmp | grep procurve
+/usr/lib/centreon-plugins/centreon_hp_procurve_snmp.pl \
+  --plugin=network::hp::procurve::snmp::plugin \
+  --mode=interfaces \
+  --hostname=192.168.53.10 \
+  --snmp-version=2c \
+  --snmp-community=public \
+  --name --add-status --add-traffic
