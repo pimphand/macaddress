@@ -1,4 +1,4 @@
-/usr/lib/centreon/plugins/centreon_hp_procurve_snmp.pl \
+/usr/lib/centreon/plugins/centreon_hp_procurve.pl \
   --plugin=network::hp::procurve::snmp::plugin \
   --mode=interfaces \
   --hostname=192.168.53.10 \
