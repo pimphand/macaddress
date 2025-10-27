@@ -1,19 +1,19 @@
-#!/bin/bash
+cat <<EOF > /etc/centreon-gorgone/config.d/40-gorgoned.yaml
+name:  gorgoned-pooler-50
+description: Configuration for poller pooler-50
+gorgone:
+  gorgonecore:
+    id: 3
+    external_com_type: tcp
+    external_com_path: "*:5556"
+    authorized_clients: 
+      - key: runI2NQL75wFLlrNn34O3BW2eF4ZpHaIiZjh59D7pSg
+    privkey: "/var/lib/centreon-gorgone/.keys/rsakey.priv.pem"
+    pubkey: "/var/lib/centreon-gorgone/.keys/rsakey.pub.pem"
+  modules:
+    - name: engine
+      package: gorgone::modules::centreon::engine::hooks
+      enable: true
+      command_file: "/var/lib/centreon-engine/rw/centengine.cmd"
 
-IP="192.168.53.10"
-COMMUNITY="public"
-PORT="3"
-
-snmpwalk -v2c -c $COMMUNITY $IP 1.3.6.1.2.1.17.4.3.1.3 | grep " $PORT$" | while read -r line; do
-    # Ambil bagian OID (angka-angka belakang sebelum '=')
-    OID=$(echo "$line" | awk '{print $1}')
-    # Ambil angka heksadesimal setelah OID
-    HEX=$(echo "$OID" | awk -F '.' '{for(i=12;i<=NF;i++) printf "%02X:", $i; print ""}')
-    # Buang ":" terakhir
-    MAC=$(echo "$HEX" | sed 's/:$//')
-    
-    # Ambil port number
-    PNUM=$(echo "$line" | awk '{print $NF}')
-    
-    echo "MAC Address: $MAC  -->  Port: $PNUM"
-done
+EOF
