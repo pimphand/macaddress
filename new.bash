@@ -26,3 +26,6 @@ systemctl restart gorgoned
 sudo -u centreon php /usr/share/centreon/bin/console debug:router | grep api
 
 /var/log/centreon-engine/centengine.log
+
+192.168.53.10   nms-dev.awetonet.io centreon-central
+nano /etc/hosts
