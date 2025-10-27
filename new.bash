@@ -23,3 +23,4 @@ systemctl status gorgoned
 systemctl restart gorgoned
 
 822-1376-9b4cf4d7-s3lab.awetonet.io
+sudo -u centreon php /usr/share/centreon/bin/console debug:router | grep api
