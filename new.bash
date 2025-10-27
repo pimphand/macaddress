@@ -17,3 +17,7 @@ gorgone:
       command_file: "/var/lib/centreon-engine/rw/centengine.cmd"
 
 EOF
+
+systemctl restart gorgoned
+systemctl status gorgoned
+systemctl restart gorgoned
