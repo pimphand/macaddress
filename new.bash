@@ -31,3 +31,4 @@ sudo -u centreon php /usr/share/centreon/bin/console debug:router | grep api
 nano /etc/hosts
 
 nc -zv nms-dev.awetonet.io 5669
+sudo -u centreon gorgonectl ping poll-53
