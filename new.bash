@@ -29,3 +29,5 @@ sudo -u centreon php /usr/share/centreon/bin/console debug:router | grep api
 
 192.168.53.10   nms-dev.awetonet.io centreon-central
 nano /etc/hosts
+
+nc -zv nms-dev.awetonet.io 5669
