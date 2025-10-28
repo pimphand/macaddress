@@ -37,12 +37,8 @@ sudo -u centreon gorgonectl ping poll-53
 
 cat /etc/centreon/conf.pm | grep password
 
+$options{option_results}->{snmp_version} =~ s/^v//;
 if (!defined($options{option_results}->{snmp_version}) || $options{option_results}->{snmp_version} eq '') {
     $options{option_results}->{snmp_version} = '2c';
-}
-
-# Default SNMP version = 2c
-if (!defined($plugin->{option_results}->{snmp_version}) || $plugin->{option_results}->{snmp_version} eq '') {
-    $plugin->{option_results}->{snmp_version} = '2c';
 }
 
