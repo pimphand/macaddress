@@ -34,3 +34,5 @@ nc -zv nms-dev.awetonet.io 5669
 sudo -u centreon gorgonectl ping poll-53
 
 /bin/sh -c '/usr/lib/centreon/plugins/centreon_hp_procurve_snmp.pl --plugin=network::hp::procurve::snmp::plugin --mode=interfaces --hostname=192.168.53.10 --snmp-version= --snmp-community= --name --add-status --add-traffic'
+
+cat /etc/centreon/conf.pm | grep password
