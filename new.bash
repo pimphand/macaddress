@@ -42,3 +42,12 @@ if (!defined($options{option_results}->{snmp_version}) || $options{option_result
     $options{option_results}->{snmp_version} = '2c';
 }
 
+/usr/lib/centreon/plugins/centreon_hp_procurve_snmp.pl \
+  --plugin=network::hp::procurve::snmp::plugin \
+  --mode=interfaces \
+  --hostname=192.168.53.10 \
+  --snmp-version=2c \
+  --snmp-community='public' \
+  --name='^E12$' \
+  --add-traffic
+
