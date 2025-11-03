@@ -17,3 +17,6 @@ gorgone:
       command_file: "/var/lib/centreon-engine/rw/centengine.cmd"
 
 EOF
+
+mysql -u centreon -p centreon
+SELECT id, name, ns_ip_address, engine_start_command FROM nagios_server;
