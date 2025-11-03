@@ -20,3 +20,6 @@ EOF
 
 mysql -u centreon -p centreon
 SELECT id, name, ns_ip_address, engine_start_command FROM nagios_server;
+
+
+centreon -u admin -p 'C3ntr30n!0101' -o HTPL -a ADD -v "HP-Switch-Template;HP ProCurve Monitoring Template"
